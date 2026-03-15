@@ -295,6 +295,6 @@ Objectifs :
 
 # Auteur
 
-Mahmud Ba
+Thierno Mamoudou BAH
 
 Projet réalisé dans le cadre du module **Génie Logiciel**.
