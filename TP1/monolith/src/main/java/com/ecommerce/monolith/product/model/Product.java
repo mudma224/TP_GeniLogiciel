@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,4 +30,8 @@ public class Product {
     @PositiveOrZero(message = "Stock cannot be negative")
     @Column(nullable = false)
     private Integer stock;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 }
