@@ -114,7 +114,7 @@ com.ecommerce.monolith.product
 
 ## Base de Données
 
-Le TP utilise **PostgreSQL**.
+Le TP utilise **PostgreSQL**. Assurer vous lire le fichier **application.propreties**  pour le mettre a jour avant de lancer l'app.
 
 Schéma simplifié :
 
