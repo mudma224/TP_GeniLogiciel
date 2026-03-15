@@ -1,72 +1,48 @@
-# TP_GeniLogiciel
-# TP1
-# E-Commerce Product API — Spring Boot
+# Génie Logiciel — Projets Spring Boot
 
-## 📌 Description
+## Description
 
-Ce projet est une **API REST développée avec Spring Boot** permettant de gérer des produits dans un système e-commerce simple.
+Ce dépôt contient une série de **travaux pratiques réalisés dans le cadre du module de Génie Logiciel**.
 
-L'application implémente un **CRUD complet (Create, Read, Update, Delete)** pour les produits et introduit également une **relation entre entités avec JPA** à travers une catégorie de produits.
+L'objectif global est de construire progressivement une application **E-commerce backend en Java avec Spring Boot**, en passant par plusieurs architectures :
 
-Le projet utilise **PostgreSQL comme base de données** et expose les endpoints REST testables avec **Postman**.
+1. **TP1 — Monolithe simple (CRUD REST API)**
+2. **TP2 — Monolithe modulaire**
+3. **TP3 — Architecture distribuée (microservices)**
 
-Ce TP a pour objectif de comprendre :
-
-* l’architecture d’une application **Spring Boot**
-* la gestion des **entités JPA**
-* les relations entre entités (**ManyToOne**)
-* l’utilisation de **Spring Data JPA**
-* l’exposition d’API REST
-* l’utilisation de **Spring Data REST**
+Chaque TP introduit **de nouveaux concepts d’architecture logicielle** et améliore la structure du projet.
 
 ---
 
-# 🏗 Architecture du projet
+# Structure du Repository
 
-Le projet suit l’architecture classique **Spring Boot en couches** :
-
-```
-Client HTTP (Postman)
-        │
-        ▼
-Controller (API REST)
-        │
-        ▼
-Service (Logique métier)
-        │
-        ▼
-Repository (Accès aux données)
-        │
-        ▼
-PostgreSQL Database
-```
-
-Structure des packages :
+Le repository est organisé par TP :
 
 ```
-com.ecommerce.monolith
+TP_GeniLogiciel
 │
-├── product
-│   ├── controller
-│   │      ProductController
-│   │
-│   ├── service
-│   │      ProductService
-│   │
-│   ├── repository
-│   │      ProductRepository
-│   │      CategoryRepository
-│   │
-│   └── model
-│          Product
-│          Category
+├── TP1
+│   └── Monolith REST API
+│
+├── TP2
+│   └── Modular Monolith Architecture
+│
+├── TP3
+│   └── Distributed Architecture (Microservices)
+│
+├── README.md
+└── .gitignore
 ```
+
+Chaque dossier contient **le code source et les instructions spécifiques au TP**.
 
 ---
 
-# ⚙️ Technologies utilisées
+# Technologies Utilisées
 
-* Java 17+
+Les différents TP utilisent les technologies suivantes :
+
+* Java
 * Spring Boot
 * Spring Data JPA
 * Spring Data REST
@@ -76,13 +52,71 @@ com.ecommerce.monolith
 * Maven
 * Postman
 
+Les TP suivants introduiront également :
+
+* MapStruct
+* DTO Pattern
+* Modular Architecture
+* Microservices Architecture
+
 ---
 
-# 🗄 Base de données
+# TP1 — API REST Monolithique
 
-Base de données utilisée : **PostgreSQL**
+## Objectif
 
-Schéma :
+Construire une **API REST simple pour gérer des produits d’un système e-commerce**.
+
+Ce TP permet de comprendre :
+
+* l’architecture d’une application Spring Boot
+* la création d’API REST
+* l’utilisation de Spring Data JPA
+* la connexion à une base de données PostgreSQL
+* la gestion des relations entre entités
+
+---
+
+## Architecture du TP1
+
+Le projet suit une architecture en couches :
+
+```
+Controller
+   ↓
+Service
+   ↓
+Repository
+   ↓
+Database
+```
+
+Structure :
+
+```
+com.ecommerce.monolith.product
+│
+├── controller
+│   └── ProductController
+│
+├── service
+│   └── ProductService
+│
+├── repository
+│   └── ProductRepository
+│
+└── model
+    ├── Product
+    └── Category
+```
+
+---
+
+## Base de Données
+
+Le TP utilise **PostgreSQL**.
+
+Schéma simplifié :
 
 ```
 categories
@@ -108,60 +142,38 @@ Relation :
 Product → ManyToOne → Category
 ```
 
-Un produit appartient à **une catégorie**, tandis qu'une catégorie peut contenir **plusieurs produits**.
+---
+
+## Endpoints API
+
+### Produits
+
+| Méthode | Endpoint             | Description           |
+| ------- | -------------------- | --------------------- |
+| GET     | `/api/products`      | Liste des produits    |
+| GET     | `/api/products/{id}` | Détail d'un produit   |
+| POST    | `/api/products`      | Création d'un produit |
+| PUT     | `/api/products/{id}` | Mise à jour           |
+| DELETE  | `/api/products/{id}` | Suppression           |
 
 ---
 
-# 📦 Entités
+### Catégories
 
-## Product
+Les catégories sont exposées automatiquement via **Spring Data REST**.
 
-Représente un produit dans le système e-commerce.
-
-Attributs :
-
-| Champ       | Type       | Description          |
-| ----------- | ---------- | -------------------- |
-| id          | Long       | Identifiant          |
-| name        | String     | Nom du produit       |
-| description | String     | Description          |
-| price       | BigDecimal | Prix                 |
-| stock       | Integer    | Quantité disponible  |
-| category    | Category   | Catégorie du produit |
-
-Validation :
-
-* `@NotBlank`
-* `@NotNull`
-* `@Positive`
-* `@PositiveOrZero`
+| Méthode | Endpoint           |
+| ------- | ------------------ |
+| GET     | `/categories`      |
+| POST    | `/categories`      |
+| GET     | `/categories/{id}` |
+| DELETE  | `/categories/{id}` |
 
 ---
 
-## Category
+## Exemple de Requête
 
-Représente une catégorie de produits.
-
-| Champ | Type   |
-| ----- | ------ |
-| id    | Long   |
-| name  | String |
-
----
-
-# 🔗 API Endpoints
-
-## Produits
-
-| Méthode | Endpoint             | Description             |
-| ------- | -------------------- | ----------------------- |
-| GET     | `/api/products`      | Liste tous les produits |
-| GET     | `/api/products/{id}` | Récupère un produit     |
-| POST    | `/api/products`      | Créer un produit        |
-| PUT     | `/api/products/{id}` | Modifier un produit     |
-| DELETE  | `/api/products/{id}` | Supprimer un produit    |
-
-Exemple de requête POST :
+Créer un produit :
 
 ```json
 {
@@ -177,30 +189,17 @@ Exemple de requête POST :
 
 ---
 
-## Catégories (Spring Data REST)
+## Lancer le Projet
 
-Les catégories sont exposées automatiquement via **Spring Data REST**.
-
-| Méthode | Endpoint           |
-| ------- | ------------------ |
-| GET     | `/categories`      |
-| POST    | `/categories`      |
-| GET     | `/categories/{id}` |
-| DELETE  | `/categories/{id}` |
-
----
-
-# ▶️ Lancer le projet
-
-## 1️⃣ Cloner le projet
+### 1. Cloner le repository
 
 ```
-git clone https://github.com/ton-username/ecommerce-api.git
+git clone https://github.com/your-username/TP_GeniLogiciel.git
 ```
 
 ---
 
-## 2️⃣ Configurer PostgreSQL
+### 2. Configurer PostgreSQL
 
 Créer la base de données :
 
@@ -208,15 +207,9 @@ Créer la base de données :
 CREATE DATABASE ecommerce;
 ```
 
-Créer le schéma :
-
-```
-CREATE SCHEMA ecommerce_app;
-```
-
 ---
 
-## 3️⃣ Configurer `application.properties`
+### 3. Configurer `application.properties`
 
 ```
 spring.datasource.url=jdbc:postgresql://localhost:5432/ecommerce
@@ -229,7 +222,7 @@ spring.jpa.show-sql=true
 
 ---
 
-## 4️⃣ Lancer l'application
+### 4. Lancer l'application
 
 ```
 mvn spring-boot:run
@@ -243,26 +236,65 @@ http://localhost:8080
 
 ---
 
-# 🧪 Tests avec Postman
+# TP2 — Monolithe Modulaire
 
-Les endpoints peuvent être testés avec **Postman**.
+⚠️ **En cours de développement**
 
-Exemple :
+Le TP2 vise à restructurer l'application monolithique en **modules métier distincts** afin d'améliorer la maintenabilité et préparer une transition vers une architecture microservices.
+
+Concepts introduits :
+
+* Modular Monolith
+* DTO Pattern
+* Mapper Pattern
+* Service Interface + Implementation
+* MapStruct
+* Domain Boundaries
+
+Structure prévue :
 
 ```
-GET http://localhost:8080/api/products
+com.ecommerce.monolith
+│
+├── product
+│   ├── controller
+│   ├── service
+│   ├── repository
+│   ├── model
+│   ├── dto
+│   └── mapper
+│
+├── order
+│   ├── controller
+│   ├── service
+│   ├── repository
+│   ├── model
+│   ├── dto
+│   └── mapper
 ```
+
+Cette architecture permet de **séparer les domaines métier** et facilite une future migration vers des **microservices indépendants**.
 
 ---
 
-# 🎯 Objectifs pédagogiques
+# TP3 — Architecture Distribuée
 
-Ce TP permet de comprendre :
+⚠️ **À venir**
 
-* la création d'une **API REST avec Spring Boot**
-* l'utilisation de **Spring Data JPA**
-* la gestion des **entités et relations**
-* la connexion avec **PostgreSQL**
-* l'exposition automatique d'API avec **Spring Data REST**
+Le TP3 introduira une **architecture distribuée basée sur des microservices**.
+
+Objectifs :
+
+* découper l'application en services indépendants
+* communication entre services
+* API Gateway
+* service discovery
+* gestion des bases de données par service
 
 ---
+
+# Auteur
+
+Mahmud Ba
+
+Projet réalisé dans le cadre du module **Génie Logiciel**.
