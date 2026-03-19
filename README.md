@@ -4,45 +4,39 @@
 
 Ce dépôt contient une série de **travaux pratiques réalisés dans le cadre du module de Génie Logiciel**.
 
-L'objectif global est de construire progressivement une application **E-commerce backend en Java avec Spring Boot**, en passant par plusieurs architectures :
+L'objectif est de construire progressivement une application **E-commerce backend en Java avec Spring Boot**, en faisant évoluer son architecture :
 
 1. **TP1 — Monolithe simple (CRUD REST API)**
 2. **TP2 — Monolithe modulaire**
 3. **TP3 — Architecture distribuée (microservices)**
 
-Chaque TP introduit **de nouveaux concepts d’architecture logicielle** et améliore la structure du projet.
+Chaque TP introduit **de nouveaux concepts d’architecture logicielle** et améliore la qualité du code.
 
 ---
 
 # Structure du Repository
 
-Le repository est organisé par TP :
-
 ```
 TP_GeniLogiciel
 │
 ├── TP1
-│   └── Monolith REST API
+│   └── monolith
 │
 ├── TP2
-│   └── Modular Monolith Architecture
+│   └── modular_monolith
 │
 ├── TP3
-│   └── Distributed Architecture (Microservices)
+│   └── microservices (à venir)
 │
 ├── README.md
 └── .gitignore
 ```
 
-Chaque dossier contient **le code source et les instructions spécifiques au TP**.
-
 ---
 
 # Technologies Utilisées
 
-Les différents TP utilisent les technologies suivantes :
-
-* Java
+* Java 21
 * Spring Boot
 * Spring Data JPA
 * Spring Data REST
@@ -51,79 +45,41 @@ Les différents TP utilisent les technologies suivantes :
 * Lombok
 * Maven
 * Postman
-
-Les TP suivants introduiront également :
-
 * MapStruct
-* DTO Pattern
-* Modular Architecture
-* Microservices Architecture
 
 ---
 
-# TP1 — API REST Monolithique
+# TP1 — Monolithe REST API
 
 ## Objectif
 
-Construire une **API REST simple pour gérer des produits d’un système e-commerce**.
-
-Ce TP permet de comprendre :
-
-* l’architecture d’une application Spring Boot
-* la création d’API REST
-* l’utilisation de Spring Data JPA
-* la connexion à une base de données PostgreSQL
-* la gestion des relations entre entités
+Construire une **API REST simple pour gérer des produits**.
 
 ---
 
-## Architecture du TP1
-
-Le projet suit une architecture en couches :
+## Architecture
 
 ```
-Controller
-   ↓
-Service
-   ↓
-Repository
-   ↓
-Database
+Controller → Service → Repository → Database
 ```
 
-Structure :
+---
+
+## Modules
 
 ```
-com.ecommerce.monolith.product
-│
+product
 ├── controller
-│   └── ProductController
-│
 ├── service
-│   └── ProductService
-│
 ├── repository
-│   └── ProductRepository
-│
 └── model
-    ├── Product
-    └── Category
 ```
 
 ---
 
 ## Base de Données
 
-Le TP utilise **PostgreSQL**. Assurer vous lire le fichier **application.propreties**  pour le mettre a jour avant de lancer l'app.
-
-Schéma simplifié :
-
-```
-categories
----------
-id
-name
-```
+Schéma :
 
 ```
 products
@@ -136,62 +92,209 @@ stock
 category_id
 ```
 
-Relation :
-
-```
-Product → ManyToOne → Category
-```
-
 ---
 
-## Endpoints API
-
-### Produits
-
-| Méthode | Endpoint             | Description           |
-| ------- | -------------------- | --------------------- |
-| GET     | `/api/products`      | Liste des produits    |
-| GET     | `/api/products/{id}` | Détail d'un produit   |
-| POST    | `/api/products`      | Création d'un produit |
-| PUT     | `/api/products/{id}` | Mise à jour           |
-| DELETE  | `/api/products/{id}` | Suppression           |
-
----
-
-### Catégories
-
-Les catégories sont exposées automatiquement via **Spring Data REST**.
+## Endpoints principaux
 
 | Méthode | Endpoint           |
 | ------- | ------------------ |
-| GET     | `/categories`      |
-| POST    | `/categories`      |
-| GET     | `/categories/{id}` |
-| DELETE  | `/categories/{id}` |
+| GET     | /api/products      |
+| GET     | /api/products/{id} |
+| POST    | /api/products      |
+| PUT     | /api/products/{id} |
+| DELETE  | /api/products/{id} |
 
 ---
 
-## Exemple de Requête
+# TP2 — Monolithe Modulaire ✅
 
-Créer un produit :
+## Objectif
+
+Refactorer l'application en une architecture **modulaire par domaine métier**.
+
+---
+
+## Concepts introduits
+
+* DTO Pattern
+* Mapper Pattern
+* MapStruct
+* Service Layer propre
+* Séparation des responsabilités
+* Communication inter-modules
+
+---
+
+## Architecture globale
+
+```
+Controller → Service → Mapper → Repository → Database
+```
+
+---
+
+## Structure
+
+```
+com.ecommerce.monolith
+
+├── product
+├── customer
+└── order
+```
+
+---
+
+## Modules détaillés
+
+### 🔹 Product
+
+```
+product
+├── controller
+├── service
+├── repository
+├── model
+├── dto
+└── mapper
+```
+
+---
+
+### 🔹 Customer
+
+```
+customer
+├── controller
+├── service
+├── repository
+├── model
+├── dto
+└── mapper
+```
+
+---
+
+### 🔹 Order
+
+```
+order
+├── controller
+├── service
+├── repository
+├── model
+├── dto
+└── mapper
+```
+
+---
+
+## 🔗 Relations métier
+
+```
+Customer → 1..* → Order
+Order → 1 → Product
+```
+
+---
+
+## ⚠️ Règle d’architecture importante
+
+Les modules ne communiquent **jamais directement via les repositories** :
+
+```
+OrderService → ProductService ✅
+OrderService → CustomerService ✅
+```
+
+```
+OrderService → ProductRepository ❌
+OrderService → CustomerRepository ❌
+```
+
+👉 Cela garantit un **faible couplage** et prépare l’architecture microservices.
+
+---
+
+## Exemple — Création d’une commande
+
+### Requête
 
 ```json
 {
-  "name": "Laptop",
-  "description": "Gaming laptop",
-  "price": 1200,
-  "stock": 10,
-  "category": {
-    "id": 1
-  }
+  "quantity": 2,
+  "productId": 1,
+  "customerId": 1
 }
 ```
 
 ---
 
-## Lancer le Projet
+### Réponse
 
-### 1. Cloner le repository
+```json
+{
+  "id": 1,
+  "quantity": 2,
+  "productId": 1,
+  "customerId": 1
+}
+```
+
+---
+
+## Endpoints principaux
+
+### Products
+
+```
+/api/products
+```
+
+### Customers
+
+```
+/api/customers
+```
+
+### Orders
+
+```
+/api/orders
+```
+
+---
+
+## Ce que ce TP apporte
+
+* Architecture modulaire claire
+* Code maintenable et évolutif
+* Séparation entre API et modèle interne
+* Préparation aux microservices
+
+---
+
+# TP3 — Architecture Microservices 🚧
+
+## Objectif
+
+Transformer le monolithe modulaire en **architecture distribuée**.
+
+---
+
+## Concepts à venir
+
+* Microservices
+* API Gateway
+* Service Discovery
+* Communication inter-services
+* Base de données par service
+
+---
+
+# Lancer les Projets
+
+## 1. Cloner le repository
 
 ```
 git clone https://github.com/your-username/TP_GeniLogiciel.git
@@ -199,42 +302,39 @@ git clone https://github.com/your-username/TP_GeniLogiciel.git
 
 ---
 
-### 2. Configurer PostgreSQL
-
-Créer la base de données :
+## 2. Configurer PostgreSQL
 
 ```
 CREATE DATABASE ecommerce;
+CREATE SCHEMA IF NOT EXISTS ecommerce_app AUTHORIZATION postgres; 
+SET search_path TO ecommerce_app, public;
 ```
 
 ---
 
-### 3. Configurer `application.properties`
+## 3. Configuration (`application.properties`)
 
 ```
-spring.application.name=monolith
-
-spring.datasource.url=jdbc:postgresql://localhost:5432/ecommerce // Assurer vous d'avoir une base de donnees nommee ecommerce
+spring.datasource.url=jdbc:postgresql://localhost:5432/ecommerce
 spring.datasource.username=postgres
-spring.datasource.password= Mon_mot_de_pass // Remplacer par votre mot de pass reel
-spring.datasource.driver-class-name=org.postgresql.Driver
+spring.datasource.password=YOUR_PASSWORD
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
-spring.jpa.database-platform=org.hibernate.dialect.PostgresPlusDialect
-spring.jpa.properties.hibernate.default_schema=ecommerce_app // Assurer vous d'avoir un schema nommee ecommerce_app
-spring.datasource.username=postgres
+spring.jpa.properties.hibernate.default_schema=ecommerce_app
 ```
 
 ---
 
-### 4. Lancer l'application
+## 4. Lancer l'application
 
 ```
 mvn spring-boot:run
 ```
 
-L'API sera accessible sur :
+---
+
+## Accès API
 
 ```
 http://localhost:8080
@@ -242,65 +342,8 @@ http://localhost:8080
 
 ---
 
-# TP2 — Monolithe Modulaire
-
-⚠️ **En cours de développement**
-
-Le TP2 vise à restructurer l'application monolithique en **modules métier distincts** afin d'améliorer la maintenabilité et préparer une transition vers une architecture microservices.
-
-Concepts introduits :
-
-* Modular Monolith
-* DTO Pattern
-* Mapper Pattern
-* Service Interface + Implementation
-* MapStruct
-* Domain Boundaries
-
-Structure prévue :
-
-```
-com.ecommerce.monolith
-│
-├── product
-│   ├── controller
-│   ├── service
-│   ├── repository
-│   ├── model
-│   ├── dto
-│   └── mapper
-│
-├── order
-│   ├── controller
-│   ├── service
-│   ├── repository
-│   ├── model
-│   ├── dto
-│   └── mapper
-```
-
-Cette architecture permet de **séparer les domaines métier** et facilite une future migration vers des **microservices indépendants**.
-
----
-
-# TP3 — Architecture Distribuée
-
-⚠️ **À venir**
-
-Le TP3 introduira une **architecture distribuée basée sur des microservices**.
-
-Objectifs :
-
-* découper l'application en services indépendants
-* communication entre services
-* API Gateway
-* service discovery
-* gestion des bases de données par service
-
----
-
 # Auteur
 
-Thierno Mamoudou BAH
+**Thierno Mamoudou BAH**
 
 Projet réalisé dans le cadre du module **Génie Logiciel**.
