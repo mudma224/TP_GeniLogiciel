@@ -50,4 +50,9 @@ public class ProductService {
     public void delete(Long id) {
         repository.deleteById(id);
     }
+
+    public Product getEntityById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+    }
 }
