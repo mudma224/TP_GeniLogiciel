@@ -114,7 +114,7 @@ com.ecommerce.monolith.product
 
 ## Base de Données
 
-Le TP utilise **PostgreSQL**.
+Le TP utilise **PostgreSQL**. Assurer vous lire le fichier **application.propreties**  pour le mettre a jour avant de lancer l'app.
 
 Schéma simplifié :
 
@@ -212,12 +212,18 @@ CREATE DATABASE ecommerce;
 ### 3. Configurer `application.properties`
 
 ```
-spring.datasource.url=jdbc:postgresql://localhost:5432/ecommerce
+spring.application.name=monolith
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/ecommerce // Assurer vous d'avoir une base de donnees nommee ecommerce
 spring.datasource.username=postgres
-spring.datasource.password=your_password
+spring.datasource.password= Mon_mot_de_pass // Remplacer par votre mot de pass reel
+spring.datasource.driver-class-name=org.postgresql.Driver
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
+spring.jpa.database-platform=org.hibernate.dialect.PostgresPlusDialect
+spring.jpa.properties.hibernate.default_schema=ecommerce_app // Assurer vous d'avoir un schema nommee ecommerce_app
+spring.datasource.username=postgres
 ```
 
 ---
